@@ -1,5 +1,5 @@
-#ifndef ADS1118_h
-#define ADS1118_h
+#ifndef ADS1119_h
+#define ADS1119_h
 
 #include "Arduino.h"
 #include <SPI.h>
@@ -11,7 +11,7 @@
 */
 ///Union configuration register
 union Config {
-	///Structure of the config register of the ADS1118. (See datasheet [1])
+	///Structure of the config register of the ADS1119. (See datasheet [1])
 	struct {					
 		uint8_t reserved:1;    	///< "Reserved" bit
 		uint8_t noOperation:2; 	///< "NOP" bits
@@ -32,19 +32,19 @@ union Config {
 
 
 /**
- * Class representing the ADS1118 sensor chip
+ * Class representing the ADS1119 sensor chip
  * @author Alvaro Salazar <alvaro@denkitronik.com>
  */
-class ADS1118 {
+class ADS1119 {
     public:
         void begin();				///< This method initialize the SPI port and the config register
 #if defined(__AVR__)
-        ADS1118(uint8_t io_pin_cs);         ///< Constructor
+        ADS1119(uint8_t io_pin_cs);         ///< Constructor
 #elif defined(ESP32)
-        ADS1118(uint8_t io_pin_cs, SPIClass *spi = &SPI); 		///< Constructor
+        ADS1119(uint8_t io_pin_cs, SPIClass *spi = &SPI); 		///< Constructor
 	void begin(uint8_t sclk, uint8_t miso, uint8_t mosi);	///< This method initialize the SPI port and the config register        
 #endif
-	double getTemperature();			///< Getting the temperature in degrees celsius from the internal sensor of the ADS1118
+	double getTemperature();			///< Getting the temperature in degrees celsius from the internal sensor of the ADS1119
         uint16_t getADCValue(uint8_t inputs);					///< Getting a sample from the specified input
 	bool getADCValueNoWait(uint8_t pin_drdy, uint16_t &value);
 	bool getMilliVoltsNoWait(uint8_t pin_drdy, double &volts); ///< Getting the millivolts from the settled inputs
@@ -72,7 +72,7 @@ class ADS1118 {
         union Config configRegister;        ///< Config register
 
         //Bit constants
-	const uint32_t SCLK       = 2000000;///< ADS1118 SCLK frequency: 4000000 Hz Maximum for ADS1118
+	const uint32_t SCLK       = 2000000;///< ADS1119 SCLK frequency: 4000000 Hz Maximum for ADS1119
 		
 	// Used by "SS" bit
 	const uint8_t START_NOW   = 1;      ///< Start of conversion in single-shot mode
@@ -152,8 +152,8 @@ private:
 	860 	16 (14.8) 	16 (14.9) 	 16 (15.07) 	16 (14.95) 		16 (14.61) 		16 (13.8)
 	
 	
-	[1] Texas Instruments, "ADS1118 Ultrasmall, Low-Power, SPI™-Compatible, 16-Bit Analog-to-Digital 
-	Converter with Internal Reference and Temperature Sensor", ADS1118 datasheet, SBAS457E [OCTOBER 2010–REVISED OCTOBER 2015]. 
+	[1] Texas Instruments, "ADS1119 Ultrasmall, Low-Power, SPI™-Compatible, 16-Bit Analog-to-Digital 
+	Converter with Internal Reference and Temperature Sensor", ADS1119 datasheet, SBAS457E [OCTOBER 2010–REVISED OCTOBER 2015]. 
 	
 	Note: This information is taken from http://www.ti.com
 	      Copyright © 2010–2015, Texas Instruments Incorporated

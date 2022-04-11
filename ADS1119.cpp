@@ -1,5 +1,5 @@
 /**
-*  Arduino Library for Texas Instruments ADS1118 - 16-Bit Analog-to-Digital Converter with 
+*  Arduino Library for Texas Instruments ADS1119 - 16-Bit Analog-to-Digital Converter with 
 *  Internal Reference and Temperature Sensor
 *  
 *  @author Alvaro Salazar <alvaro@denkitronik.com>
@@ -32,7 +32,7 @@
  * THE SOFTWARE.
  */
  
-#include "ADS1118.h"
+#include "ADS1119.h"
 #include "Arduino.h"
 
 /**
@@ -70,7 +70,7 @@
  * Constructor of the class
  * @param io_pin_cs a byte indicating the pin to be use as the chip select pin (CS)
  */
-ADS1118::ADS1118(uint8_t io_pin_cs) {
+ADS1119::ADS1119(uint8_t io_pin_cs) {
     cs = io_pin_cs;
 }						///< This method initialize the SPI port and the config register        
 #elif defined(ESP32)
@@ -78,7 +78,7 @@ ADS1118::ADS1118(uint8_t io_pin_cs) {
  * Constructor of the class
  * @param io_pin_cs a byte indicating the pin to be use as the chip select pin (CS)
  */
-ADS1118::ADS1118(uint8_t io_pin_cs, SPIClass *spi) {
+ADS1119::ADS1119(uint8_t io_pin_cs, SPIClass *spi) {
     cs = io_pin_cs;
     pSpi = spi;
 }       
@@ -89,7 +89,7 @@ ADS1118::ADS1118(uint8_t io_pin_cs, SPIClass *spi) {
 /**
  * This method initialize the SPI port and the config register
  */
-void ADS1118::begin() {
+void ADS1119::begin() {
     pinMode(cs, OUTPUT);
     digitalWrite(cs, HIGH);
     SPI.begin();
@@ -101,7 +101,7 @@ void ADS1118::begin() {
 /**
  * This method initialize the SPI port and the config register
  */
-void ADS1118::begin() {
+void ADS1119::begin() {
     pinMode(cs, OUTPUT);
     digitalWrite(cs, HIGH);
     pSpi->begin();
@@ -109,7 +109,7 @@ void ADS1118::begin() {
     DEBUG_BEGIN(configRegister); //Debug this method: print the config register in the Serial port
 }      
 
-void ADS1118::begin(uint8_t sclk, uint8_t miso, uint8_t mosi) {
+void ADS1119::begin(uint8_t sclk, uint8_t miso, uint8_t mosi) {
     pinMode(cs, OUTPUT);
 	digitalWrite(cs, HIGH);
     pSpi->begin(sclk, miso, mosi, cs);
@@ -120,10 +120,10 @@ void ADS1118::begin(uint8_t sclk, uint8_t miso, uint8_t mosi) {
 
 /**
  * Getting a sample from the specified input if data is ready
- * @param pin_drdy io pin connected to ADS1118 DOUT/DRDY. value Reference of ADC value to be fetched
+ * @param pin_drdy io pin connected to ADS1119 DOUT/DRDY. value Reference of ADC value to be fetched
  * @return True if ADC data is ready
  */
-bool ADS1118::getADCValueNoWait(uint8_t pin_drdy, uint16_t &value) {
+bool ADS1119::getADCValueNoWait(uint8_t pin_drdy, uint16_t &value) {
     byte dataMSB, dataLSB;	
 	pSpi->beginTransaction(SPISettings(SCLK, MSBFIRST, SPI_MODE1));
 	digitalWrite(cs, LOW);
@@ -146,7 +146,7 @@ bool ADS1118::getADCValueNoWait(uint8_t pin_drdy, uint16_t &value) {
  * Getting the millivolts from the settled inputs
  * @return A double (32bits) containing the ADC value in millivolts
  */
-bool ADS1118::getMilliVoltsNoWait(uint8_t pin_drdy, double &volts) {
+bool ADS1119::getMilliVoltsNoWait(uint8_t pin_drdy, double &volts) {
     float fsr = pgaFSR[configRegister.bits.pga];
 	uint16_t value;
 	bool dataReady=getADCValueNoWait(pin_drdy, value);
@@ -169,7 +169,7 @@ bool ADS1118::getMilliVoltsNoWait(uint8_t pin_drdy, double &volts) {
  * @param inputs Sets the input of the ADC: Diferential inputs: DIFF_0_1, DIFF_0_3, DIFF_1_3, DIFF_2_3. Single ended input: AIN_0, AIN_1, AIN_2, AIN_3
  * @return A word containing the ADC value
  */
-uint16_t ADS1118::getADCValue(uint8_t inputs) {
+uint16_t ADS1119::getADCValue(uint8_t inputs) {
     uint16_t value;
     byte dataMSB, dataLSB, configMSB, configLSB, count=0;
 	if(lastSensorMode==ADC_MODE)  //Lucky you! We don't have to read twice the sensor
@@ -214,7 +214,7 @@ uint16_t ADS1118::getADCValue(uint8_t inputs) {
  * @param inputs Sets the inputs to be adquired. Diferential inputs: DIFF_0_1, DIFF_0_3, DIFF_1_3, DIFF_2_3. Single ended input: AIN_0, AIN_1, AIN_2, AIN_3
  * @return A double (32bits) containing the ADC value in millivolts
  */
-double ADS1118::getMilliVolts(uint8_t inputs) {
+double ADS1119::getMilliVolts(uint8_t inputs) {
     float volts;
     float fsr = pgaFSR[configRegister.bits.pga];
     uint16_t value;
@@ -233,7 +233,7 @@ double ADS1118::getMilliVolts(uint8_t inputs) {
  * Getting the millivolts from the settled inputs
  * @return A double (32bits) containing the ADC value in millivolts
  */
-double ADS1118::getMilliVolts() {
+double ADS1119::getMilliVolts() {
     float volts;
     float fsr = pgaFSR[configRegister.bits.pga];
     uint16_t value;
@@ -250,10 +250,10 @@ double ADS1118::getMilliVolts() {
 
 
 /**
- * Getting the temperature in degrees celsius from the internal sensor of the ADS1118
+ * Getting the temperature in degrees celsius from the internal sensor of the ADS1119
  * @return A double (32bits) containing the temperature in degrees celsius of the internal sensor
  */
-double ADS1118::getTemperature() {
+double ADS1119::getTemperature() {
     uint16_t convRegister;
     uint8_t dataMSB, dataLSB, configMSB, configLSB, count=0;
     if(lastSensorMode==TEMP_MODE)
@@ -298,7 +298,7 @@ double ADS1118::getTemperature() {
  * Setting the sampling rate specified in the config register
  * @param samplingRate It's the sampling rate: RATE_8SPS, RATE_16SPS, RATE_32SPS, RATE_64SPS, RATE_128SPS, RATE_250SPS, RATE_475SPS, RATE_860SPS
  */
-void ADS1118::setSamplingRate(uint8_t samplingRate){
+void ADS1119::setSamplingRate(uint8_t samplingRate){
     configRegister.bits.rate=samplingRate;
 }
 
@@ -306,7 +306,7 @@ void ADS1118::setSamplingRate(uint8_t samplingRate){
  * Setting the full scale range in the config register
  * @param fsr The full scale range: FSR_6144 (±6.144V)*, FSR_4096(±4.096V)*, FSR_2048(±2.048V), FSR_1024(±1.024V), FSR_0512(±0.512V), FSR_0256(±0.256V). (*) No more than VDD + 0.3 V must be applied to this device.
  */
-void ADS1118::setFullScaleRange(uint8_t fsr){
+void ADS1119::setFullScaleRange(uint8_t fsr){
     configRegister.bits.pga=fsr;
 }
 
@@ -314,35 +314,35 @@ void ADS1118::setFullScaleRange(uint8_t fsr){
  * Setting the inputs to be adquired in the config register. 
  * @param input The input selected: Diferential inputs: DIFF_0_1, DIFF_0_3, DIFF_1_3, DIFF_2_3. Single ended input: AIN_0, AIN_1, AIN_2, AIN_3
  */
-void ADS1118::setInputSelected(uint8_t input){
+void ADS1119::setInputSelected(uint8_t input){
     configRegister.bits.mux=input;
 }
 
 /**
  * Setting to continuous adquisition mode
  */
-void ADS1118::setContinuousMode(){
+void ADS1119::setContinuousMode(){
     configRegister.bits.operatingMode=CONTINUOUS;
 }
 
 /**
  * Setting to single shot adquisition and power down mode
  */
-void ADS1118::setSingleShotMode(){
+void ADS1119::setSingleShotMode(){
     configRegister.bits.operatingMode=SINGLE_SHOT;
 }
 
 /**
  * Disabling the internal pull-up resistor of the DOUT pin
  */
-void ADS1118::disablePullup(){
+void ADS1119::disablePullup(){
     configRegister.bits.operatingMode=DOUT_NO_PULLUP;
 }
 
 /**
  * Enabling the internal pull-up resistor of the DOUT pin
  */
-void ADS1118::enablePullup(){
+void ADS1119::enablePullup(){
     configRegister.bits.operatingMode=DOUT_PULLUP;
 }
 
@@ -350,7 +350,7 @@ void ADS1118::enablePullup(){
  * Decoding a configRegister structure and then print it out to the Serial port
  * @param configRegister The config register in "union Config" format
  */
-void ADS1118::decodeConfigRegister(union Config configRegister){
+void ADS1119::decodeConfigRegister(union Config configRegister){
     String mensaje=String();
     switch(configRegister.bits.singleStart){
 	case 0: mensaje="NOINI"; break;
